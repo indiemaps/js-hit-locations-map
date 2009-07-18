@@ -7,11 +7,32 @@
         <script type="text/javascript" src="logic.js"></script>
         -->
         
-        <script type="text/javascript">
+		<!-- Map Provider & Mapstraction Javascript includes -->
+		<script type="text/javascript" src="http://api.maps.yahoo.com/ajaxymap?v=3.0&appid=MapstractionDemo"></script>
+
+		<script type="text/javascript" src="http://www.mapstraction.com/mapstraction-js/mapstraction.js"></script>
+	</head>
+	
+	<body>
+		<!-- HTML Map element - the size must be specified here, or in the CSS -->
+		<div id="mapstraction" style="width: 400px; height: 400px;"></div>
+		
+		<script type="text/javascript">
+			// initialise the map with your choice of API
+			var mapstraction = new Mapstraction('mapstraction','yahoo');
 			
-        </script>
+			mapstraction.setMapType( Mapstraction.SATELLITE );
+		
+			// create a lat/lon object
+			var myPoint = new LatLonPoint(37.4041960114344,-122.008194923401);
+
+			// display the map centered on a latitude and longitude (Google zoom levels)
+			mapstraction.setCenterAndZoom(myPoint, 10);
+
+
+		</script> 
         
-    </head>
-    <body>
+    	
+		
 	</body>
 </html>
