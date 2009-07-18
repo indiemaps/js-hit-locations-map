@@ -43,19 +43,19 @@
         			var ar = boxscoreXML.game_info.toString().match(/<br\/><b>Weather<\/b>: (\d+) degrees,.*<br\/><b>Wind<\/b>: (\d+) mph, ([\w\s]+).<br\/>/);
         			
         			var gameObject = {
-        				'game_id' : 'honkers',
-  						'date' : '',
-  						'home' : boxscoreXML.@home_team_code.toString(),
-  						'away' : boxscoreXML.@away_team_code.toString(),
-  						'game' : parseInt( boxscoreXML.@game_id.toString().substr( -1 ) ),
-  						'umpire' : '',
-  						'wind' : parseFloat( RegExp.$2 ),
-  						'wind_dir' : RegExp.$3,
-  						'temp' : parseFloat( RegExp.$1 ),
-  						'type' : gameXML.@type.toString(),
-  						'runs_home' : parseFloat( boxscoreXML.linescore.@home_team_runs.toString() ),
-  						'runs_away' : parseFloat( boxscoreXML.linescore.@away_team_runs.toString() ),
-  						'local_time' : gameXML.@local_game_time.toString()
+        				'game_id' 		: 'honkers',
+  						'date' 			: '',
+  						'home' 			: boxscoreXML.@home_team_code.toString(),
+  						'away' 			: boxscoreXML.@away_team_code.toString(),
+  						'game' 			: parseInt( boxscoreXML.@game_id.toString().substr( -1 ) ),
+  						'umpire' 		: '',
+  						'wind' 			: parseFloat( RegExp.$2 ),
+  						'wind_dir' 		: RegExp.$3,
+  						'temp' 			: parseFloat( RegExp.$1 ),
+  						'type' 			: gameXML.@type.toString(),
+  						'runs_home' 	: parseFloat( boxscoreXML.linescore.@home_team_runs.toString() ),
+  						'runs_away' 	: parseFloat( boxscoreXML.linescore.@away_team_runs.toString() ),
+  						'local_time' 	: gameXML.@local_game_time.toString()
         			};
         			
         			// get the weather info from the boxscore
