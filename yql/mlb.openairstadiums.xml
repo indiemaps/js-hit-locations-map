@@ -8,7 +8,7 @@
 	<bindings>
 		<select itemPath="stadiums.stadium" produces="XML">
 			<urls>
-				<url>http://indiemaps.com/pitchalyzer/yql/openairstadiums.xml</url>
+				<url>http://github.com/indiemaps/js-hit-locations-map/raw/master/yql/openairstadiums.xml</url>
 			</urls>
 		</select>
 	</bindings>
