@@ -29,33 +29,36 @@
         		var gamesObject = { 'game' : new Array() };
         		
         		for each ( var game in xml.go_game ) {        			
-        			var gid = game.game.@[ 'id' ];
+        			var gid = game.game.@id.toString();
 
-        			var gameURL = baseURI + datePart + '/gid_' + gid + '/game.xml';
-        			var boxURL = baseURI + datePart + '/gid_' + gid + '/boxscore.xml';
+        			var gameURL = baseURI + datePart + '/gid_' + gid + '/';
         			
-        			var boxscoreXML = y.rest( boxURL ).get().response;
-        			var gameXML = y.rest( gameURL ).get().response;
-        			
-        			// var home = boxscoreXML.@[ 'home_team_code' ].toString();
-        			// var away = boxscoreXML.@[ 'away_team_code' ].toString();
+        			var boxscoreXML = y.rest( gameURL + 'boxscore.xml' ).get().response;
+        			var gameXML = y.rest( gameURL + 'game.xml' ).get().response;
+        			var playersXML = y.rest( gameURL + 'players.xml' ).get().response;
         			
         			var ar = boxscoreXML.game_info.toString().match(/<br\/><b>Weather<\/b>: (\d+) degrees,.*<br\/><b>Wind<\/b>: (\d+) mph, ([\w\s]+).<br\/>/);
         			
+        			// gid_2009_06_08_sfnmlb_flomlb_1
+        			// 2009/07/19/chnmlb-wasmlb-1
+        			
+        			
         			var gameObject = {
-        				'game_id' 		: 'honkers',
-  						'date' 			: '',
+        				'gid' 			: 'gid_' + gid,
+        				'game_id'		: boxscoreXML.@game_id.toString(),
+  						'date' 			: boxscoreXML.@date.toString(),
   						'home' 			: boxscoreXML.@home_team_code.toString(),
   						'away' 			: boxscoreXML.@away_team_code.toString(),
   						'game' 			: parseInt( boxscoreXML.@game_id.toString().substr( -1 ) ),
-  						'umpire' 		: '',
+  						'umpire' 		: playersXML..umpire.( @position == 'home' ).@name.toString(),
   						'wind' 			: parseFloat( RegExp.$2 ),
   						'wind_dir' 		: RegExp.$3,
   						'temp' 			: parseFloat( RegExp.$1 ),
   						'type' 			: gameXML.@type.toString(),
   						'runs_home' 	: parseFloat( boxscoreXML.linescore.@home_team_runs.toString() ),
   						'runs_away' 	: parseFloat( boxscoreXML.linescore.@away_team_runs.toString() ),
-  						'local_time' 	: gameXML.@local_game_time.toString()
+  						'local_time' 	: gameXML.@local_game_time.toString(),
+  						'stadium_id'	: gameXML.stadium.@id.toString()
         			};
         			
         			// get the weather info from the boxscore
