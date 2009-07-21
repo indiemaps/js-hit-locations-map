@@ -1,36 +1,214 @@
 <html>
     <head>
-        <title>Example hit locations on a slippy map</title>
-        
-        <!--
-        <script type="text/javascript" src="vectormap.js"></script>
-        <script type="text/javascript" src="logic.js"></script>
-        -->
+        <title>Showing MLB hit locations on a Google Map</title>
         
 		<!-- Map Provider & Mapstraction Javascript includes -->
-		<script src="http://maps.google.com/maps?file=api&v=2&key=ABQIAAAAYfI_xw3MwUbmAScWsa72VBSeiHve5IwsMuqAjxrbixTJ6mqDsxTZLbNcpVxq9PneOXm7mkBjelEQpw" type="text/javascript"></script>
-
+		<script src="http://maps.google.com/maps?file=api&v=2&key=ABQIAAAA7QUChpcnvnmXxsjC7s1fCxQGj0PqsCtxKvarsoS-iqLdqZSKfxTd7Xf-2rEc_PC9o8IsJde80Wnj4g" type="text/javascript"></script>
 		<script type="text/javascript" src="http://www.mapstraction.com/mapstraction-js/mapstraction.js"></script>
+		
+		<!-- jQuery include -->
+		<script src="http://code.jquery.com/jquery-latest.js"></script>
+		
 	</head>
 	
 	<body>
+	
+		<h1 id="game"></h1>
+		<h2 id="venue"></h2>
+		
 		<!-- HTML Map element - the size must be specified here, or in the CSS -->
-		<div id="mapstraction" style="width: 400px; height: 400px;"></div>
+		<div id="mapstraction" style="width: 520px; height: 520px;"></div>
 		
 		<script type="text/javascript">
-			// initialise the map with your choice of API
-			var mapstraction = new Mapstraction('mapstraction','google');
-			
-			mapstraction.setMapType( Mapstraction.SATELLITE );
 		
-			// create a lat/lon object
-			var myPoint = new LatLonPoint(37.4041960114344,-122.008194923401);
-
-			// display the map centered on a latitude and longitude (Google zoom levels)
-			mapstraction.setCenterAndZoom(myPoint, 10);
-
+			$( document ).ready( function() {
+			
+				// initialise the map with your choice of API
+				var mapstraction = new Mapstraction('mapstraction','google');
+			
+				mapstraction.setMapType( Mapstraction.SATELLITE );
+		
+				var gid = "gid_2009_07_11_lanmlb_milmlb_1"; //"gid_2009_06_09_sdnmlb_lanmlb_1"; //"gid_2009_06_09_nyamlb_bosmlb_1"; //"gid_2009_07_11_lanmlb_milmlb_1"; "gid_2009_07_14_aasmlb_nasmlb_1";
+				
+				var stadium;
+				var game;
+				
+				var latConv;
+				var lngConv;
+				
+				getGame( gid );
+        		
+        		
+        		function getGame( gid ) {
+        			var year = gid.substring( 4, 8 );
+					var month = gid.substring( 9, 11 );
+					var day = gid.substring( 12, 14 );				
+					
+					
+					var gameQueryURL = "http://query.yahooapis.com/v1/public/yql?q=" +
+						"select%20*%20from%20games%20where%20year%3D%22" + 
+						year + 
+						"%22%20and%20month%3D%22" + 
+						month + 
+						"%22%20and%20day%3D%22" + 
+						day + 
+						"%22%20and%20gid%3D%22" +
+						gid + 
+						"%22&format=json&env=http%3A%2F%2Fgithub.com%2Findiemaps%2Fjs-hit-locations-map%2Fraw%2Fmaster%2Fyql%2Fmlb.gd2.env&callback=?";
+					$.getJSON( 	gameQueryURL, 
+						function( gameData ) {
+							
+							game = gameData.query.results.game;
+							
+							// add teams to game h1
+							$('#game').append( game.away + " at " + game.home + ", " + game.date );
+							
+							getStadium( game.stadium_id );
+  								
+						} );
+        		}
+        		
+        		function getStadium( sid ) {
+        			var stadiumQueryURL = "http://query.yahooapis.com/v1/public/yql?q=" +
+						"select%20*%20from%20stadiums%20where%20id%3D%22" +
+						game.stadium_id +
+						"%22&format=json&env=http%3A%2F%2Fgithub.com%2Findiemaps%2Fjs-hit-locations-map%2Fraw%2Fmaster%2Fyql%2Fmlb.gd2.env&callback=?";
+  								
+  					$.getJSON( 	stadiumQueryURL,
+  								function( stadiumData ) {
+  									
+  									stadium = stadiumData.query.results.stadium;
+  									
+  									$('#venue').append( stadium.name );
+							
+  									var homePlate_latLong = new LatLonPoint( parseFloat( stadium.geo.home_plate.latitude ), parseFloat( stadium.geo.home_plate.longitude ) );
+  									
+  									// m per degree
+  									latConv = homePlate_latLong.distance( new LatLonPoint( homePlate_latLong.lat + .001, homePlate_latLong.lng ) ) * 1000000;
+									lngConv = homePlate_latLong.distance( new LatLonPoint( homePlate_latLong.lat, homePlate_latLong.lng + .001 ) ) * 1000000;
+									
+									
+									var fieldCenter_feet = { x : 0, y : 250 };
+									var fieldCenter_feet_rotated = rotatePoint( fieldCenter_feet.x, fieldCenter_feet.y, stadium.geo.orientation.degrees );
+									
+									var stadiumCenter = new LatLonPoint( homePlate_latLong.lat + feetToMeters( fieldCenter_feet_rotated.y ) / latConv,
+																	homePlate_latLong.lng + feetToMeters( fieldCenter_feet_rotated.x ) / lngConv );
+									
+									// display the map centered on a latitude and longitude (Google zoom levels)
+									mapstraction.setCenterAndZoom( stadiumCenter, 18 );
+									
+									placeBases();
+									
+									getHits( gid );
+									
+  								} );
+        		}
+        		
+        		function getHits( gid ) {        			
+        			// select * from atbats where gid="gid_2009_07_11_lanmlb_milmlb_1" and hit_x<>"NaN"
+        			// http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20atbats%20where%20gid%3D%22gid_2009_07_11_lanmlb_milmlb_1%22%20and%20hit_x%3C%3E%22NaN%22&format=xml&env=http%3A%2F%2Fgithub.com%2Findiemaps%2Fjs-hit-locations-map%2Fraw%2Fmaster%2Fyql%2Fmlb.gd2.env
+        			
+        			var hitsQueryURL = "http://query.yahooapis.com/v1/public/yql?q=" +
+        				"select%20*%20from%20atbats%20where%20gid%3D%22" +
+        				gid +
+        				"%22%20and%20hit_x%3C%3E%22NaN%22&format=json&env=http%3A%2F%2Fgithub.com%2Findiemaps%2Fjs-hit-locations-map%2Fraw%2Fmaster%2Fyql%2Fmlb.gd2.env&callback=?";
+        			
+        			$.getJSON( 	hitsQueryURL,
+  								function( hitsData ) {
+  									$.each( hitsData.query.results.atbat, function( index, item ) { addHitToMap( item ); } );  									
+  								} 
+  					);
+  					
+        		}
+        		
+        		function addHitToMap( hit ) {
+        			        			
+        			var hitLocation_feet = { 	x : ( parseFloat( hit.hit_x ) - parseFloat( stadium.gameday.year2009.home_plate.x ) ) * parseFloat( stadium.gameday.year2009.pixels_per_foot ),
+        										y : ( -parseFloat( hit.hit_y ) + parseFloat( stadium.gameday.year2009.home_plate.y ) ) * parseFloat( stadium.gameday.year2009.pixels_per_foot ) };
+        			
+        			
+					var hitLocation_feet_rotated = rotatePoint( hitLocation_feet.x, hitLocation_feet.y, parseFloat( stadium.geo.orientation.degrees ) );
+					
+					
+					var hitLocation_latLong = new LatLonPoint( 	parseFloat( stadium.geo.home_plate.latitude ) + feetToMeters( hitLocation_feet_rotated.y ) / latConv, 
+																parseFloat( stadium.geo.home_plate.longitude ) + feetToMeters( hitLocation_feet_rotated.x ) / lngConv );
+					
+					
+					var hitMarker = new Marker( hitLocation_latLong );
+					
+					var size = ( hit.event=="Home Run" || hit.event=="Grounded Into DP" ) ? 15 : 6;
+					var icon = hit.hit_type=="O" ? "pinkDot.png" : "blueDot.png";
+					
+					hitMarker.setIcon( icon, [ size, size ] );
+					hitMarker.setShadowIcon( "blank.png", [ 10, 10 ] );
+					
+					mapstraction.addMarker( hitMarker );
+					
+        		}
+        		
+        		function placeBases() {
+        			var homePlateMarker = new Marker( new LatLonPoint( parseFloat( stadium.geo.home_plate.latitude ), parseFloat( stadium.geo.home_plate.longitude ) ) );
+        			homePlateMarker.setIcon( "base.png", [ 7, 7 ] );
+					homePlateMarker.setShadowIcon( "blank.png", [ 10, 10 ] );
+						
+        			mapstraction.addMarker( homePlateMarker );
+        			
+        			var bases_meters_rotated = new Array();
+					
+					
+					// second base
+					var secondBase_meters = { x : 0, y : feetToMeters( 127.28125 ) };
+					
+					bases_meters_rotated.push( rotatePoint( secondBase_meters.x, secondBase_meters.y, parseFloat( stadium.geo.orientation.degrees ) ) );
+				
+					// first & third base
+					var firstBase_meters = { x : 0, y : 27.4 };
+										
+					bases_meters_rotated.push( rotatePoint( firstBase_meters.x, firstBase_meters.y, -45 + parseFloat( stadium.geo.orientation.degrees ) ) );
+					bases_meters_rotated.push( rotatePoint( firstBase_meters.x, firstBase_meters.y, 45 + parseFloat( stadium.geo.orientation.degrees ) ) );
+				
+					
+					for ( var i = 0; i < bases_meters_rotated.length; i++ ) {					
+						
+						var base = bases_meters_rotated[ i ];
+						
+						
+						var baseLocation = new LatLonPoint( 	parseFloat( stadium.geo.home_plate.latitude ) + base.y / latConv, 
+																parseFloat( stadium.geo.home_plate.longitude ) + base.x / lngConv );
+						
+						var marker = new Marker( baseLocation );
+						marker.setIcon( "base.png", [ 7, 7 ] );
+						marker.setShadowIcon( "blank.png", [ 10, 10 ] );
+						
+						mapstraction.addMarker( marker );
+					}
+					
+        		}
+        		
+        		function rotatePoint( x, y, rotation_degrees ) 
+				{
+					var rotation_radians = rotation_degrees / 180 * Math.PI;
+			
+					var rotated = {
+						x : x * Math.cos( rotation_radians ) - y * Math.sin( rotation_radians ),
+						y : x * Math.sin( rotation_radians ) + y * Math.cos( rotation_radians ) 
+					};
+								
+					return rotated;
+				}
+				
+				function feetToMeters( feet )
+				{
+					return feet / 3.2808399;
+				}
+        		
+        		
+			} );
+				
+			
 
 		</script> 
+        
         
     	
 		
