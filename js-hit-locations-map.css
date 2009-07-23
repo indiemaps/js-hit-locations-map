@@ -1,0 +1,81 @@
+body {
+	font-family: Helvetica;
+	padding-top: 5px;
+	padding-left: 5px;
+}
+
+h1#game {
+	padding-bottom: 0;
+	margin-bottom: 0;
+}
+
+h2#venue {
+	padding-top: 8px;
+	margin-top: 2px;
+	margin-bottom: 8px;
+}
+
+h1#game, h2#venue, h3#hitsLoading {
+	padding-left: 6px;
+}
+
+h3#hitsLoading {
+	color: white;
+	position:relative;
+	top: -530px;
+	left: 1px;
+}
+
+
+#mapstraction {
+	width: 100%;
+	height: 520px;
+	
+	margin-bottom: 0;
+	padding-bottom: 0;
+}
+
+#date {
+	color: #888;
+}
+
+
+
+#wrap {
+	width: 1050px;
+	
+}
+
+#left {
+	width: 520px;
+	height: 0;
+	
+	margin-right: 15px;
+}
+
+#right {
+	position : relative;
+	
+	top: -12px;
+	left: 530px;
+					
+	width: 300px;
+	
+	height: 550px;
+}
+
+h3#ballsInPlay {
+	color: #888;
+}
+
+.legendChip_big {
+	margin-bottom: -3px;
+}
+
+.legendChip_small {
+	margin-bottom: 1px;
+}
+
+p, li {
+	line-height: 21px;
+}
