@@ -101,7 +101,6 @@
 					gid = "gid_2009_07_14_aasmlb_nasmlb_1";
 				}
 				
-				
 				mapstraction = new Mapstraction('mapstraction','google');
 				mapstraction.setMapType( Mapstraction.HYBRID );
 				
@@ -115,7 +114,6 @@
 				var month = gid.substring( 9, 11 );
 				var day = gid.substring( 12, 14 );				
 					
-					
 				var gameQueryURL = "http://query.yahooapis.com/v1/public/yql?q=" +
 					"select%20*%20from%20games%20where%20year%3D%22" + 
 					year + 
@@ -128,16 +126,9 @@
 					"%22&format=json&env=http%3A%2F%2Fgithub.com%2Findiemaps%2Fjs-hit-locations-map%2Fraw%2Fmaster%2Fyql%2Fmlb.gd2.env&callback=?";
 				$.getJSON( 	gameQueryURL, 
 					function( gameData ) {
-						
 						game = gameData.query.results.game;
-						
-						// add teams to game h1
-						
-						
 						$('#game').html( game.teams.away.name_brief + " at " + game.teams.home.name_brief + " <span id='date'>" + game.date + "<\/span>" );
-						
 						getStadium( game.stadium_id, gid );
-							
 					} );
         	}
         		
