@@ -6,7 +6,7 @@
 		<sampleQuery>select * from mlb.gd2.atbats where gid="gid_2009_07_16_milmlb_cinmlb_1"</sampleQuery>
 	</meta>
 	<bindings>
-		<select itemPath="result.atbat" produces="JSON" maxAge="24000">
+		<select itemPath="result.atbat" produces="JSON">
 			<urls>
 				<url>http://gd2.mlb.com/components/game/mlb/</url>
 			</urls>
