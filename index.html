@@ -12,7 +12,7 @@
 		<script type="text/javascript" src="http://yui.yahooapis.com/combo?2.7.0/build/yahoo-dom-event/yahoo-dom-event.js&2.7.0/build/datasource/datasource-min.js&2.7.0/build/element/element-min.js&2.7.0/build/paginator/paginator-min.js&2.7.0/build/datatable/datatable-min.js"></script>
 
 		<!-- Mapstraction -->
-		<script src="http://maps.google.com/maps?file=api&v=2&key=ABQIAAAA7QUChpcnvnmXxsjC7s1fCxQGj0PqsCtxKvarsoS-iqLdqZSKfxTd7Xf-2rEc_PC9o8IsJde80Wnj4g" type="text/javascript"></script>
+		<script src="http://maps.google.com/maps?file=api&v=2&key=ABQIAAAAJOq-F1-5CeJCDUF1QxoJLBSc9HEPH6PQyLG9Zs3AxnXJSuzAXBQG1S5P2Kf6KLQsAoaHLODIXSxRDA" type="text/javascript"></script>
 		<script type="text/javascript" src="http://www.mapstraction.com/mapstraction-js/mapstraction.js"></script>
 		
 		<!-- jQuery -->
@@ -52,16 +52,17 @@
 			
 			<p>The above mashup loads hit location data from <a href="http://gd2.mlb.com/components/game/mlb/">MLB Gameday</a> data via <a href="http://developer.yahoo.com/yql/">YQL</a> and <a href="http://jquery.com/">jQuery</a>. Data are transformed from an arbitrary pixel coordinate system to latitude-longitude points using methods I describe <a href="">here</a>. Data are presented on <a href="http://maps.google.com/">Google Maps</a> satellite tiles, using <a href="http://mapstraction.com/">Mapstraction</a> as a wrapper. The accompanying <a href="http://developer.yahoo.com/yui/">YUI</a> table shows the same data and allows selection of balls-in-play.</p>
 			
+			<p>Please excuse the wait: the YQL queries typically take a few secs to gather the game, stadium, and hit data, but in rare cases queries can take upwards of a minute. In rarer cases the whole thing freaks out and you have to hit refresh.</p>
 			<p>
 				By default (without a game specified as a url parameter), this page shows the 2009 all star game.  To see another game, simply add a <code>gid</code> parameter to the URL.  The <code>gid</code> parameter is composed as follows:
 				<ul>
 					<li><code>gid_{year}_{month}_{day}_{away_team}mlb_{home_team}mlb_{game_number}</code></li>
 				</ul>
-				So, the default <code>gid</code>, the 2009 all star game, is <a href="file:///Users/zacharyjohnson/workspaces/pitchalyzer/js-hit-locations-map/index.html?gid=gid_2009_07_14_aasmlb_nasmlb_1"><code>gid_2009_07_14_aasmlb_nasmlb_1</code></a>.  A few other example games:
+				So, the default <code>gid</code>, the 2009 all star game, is <a href="http://indiemaps.com/js-hit-locations-map/index.html?gid=gid_2009_07_14_aasmlb_nasmlb_1"><code>gid_2009_07_14_aasmlb_nasmlb_1</code></a>.  A few other example games:
 				<ul>
-					<li><a href="file:///Users/zacharyjohnson/workspaces/pitchalyzer/js-hit-locations-map/index.html?gid=gid_2009_07_10_sdnmlb_sfnmlb_1"><code>gid_2009_07_10_sdnmlb_sfnmlb_1</code></a>: Padres at Giants, July 10, 2009 (2009's only no-hitter)</li>
-					<li><a href="file:///Users/zacharyjohnson/workspaces/pitchalyzer/js-hit-locations-map/index.html?gid=gid_2009_05_22_phimlb_nyamlb_1"><code>gid_2009_05_22_phimlb_nyamlb_1</code></a>: Phillies at Yankees, May 22, 2009 (includes 2009's <a href="http://www.hittrackeronline.com/">longest homer</a>, 477 ft. by Raul Ibanez)</li>
-					<li><a href="file:///Users/zacharyjohnson/workspaces/pitchalyzer/js-hit-locations-map/index.html?gid=gid_2009_05_03_oakmlb_seamlb_1"><code>gid_2009_05_03_oakmlb_seamlb_1</code></a>: Athletics at Mariners, May 3, 2009 (the longest game this season)</li>
+					<li><a href="http://indiemaps.com/js-hit-locations-map/index.html?gid=gid_2009_07_10_sdnmlb_sfnmlb_1"><code>gid_2009_07_10_sdnmlb_sfnmlb_1</code></a>: Padres at Giants, July 10, 2009 (2009's only no-hitter)</li>
+					<li><a href="http://indiemaps.com/js-hit-locations-map/index.html?gid=gid_2009_05_22_phimlb_nyamlb_1"><code>gid_2009_05_22_phimlb_nyamlb_1</code></a>: Phillies at Yankees, May 22, 2009 (includes 2009's <a href="http://www.hittrackeronline.com/">longest homer</a>, 477 ft. by Raul Ibanez)</li>
+					<li><a href="http://indiemaps.com/js-hit-locations-map/index.html?gid=gid_2009_05_03_oakmlb_seamlb_1"><code>gid_2009_05_03_oakmlb_seamlb_1</code></a>: Athletics at Mariners, May 3, 2009 (the longest game this season)</li>
 				</ul>
 				Created by Zachary Forest Johnson of <a href="http://indiemaps.com/blog">indiemaps.com</a>. Just <em>view source</em> to see what's going on. Code is <a href="http://www.opensource.org/licenses/bsd-license.php">BSD</a> licensed and available <a href="http://github.com/indiemaps/js-hit-locations-map/tree/master">on github</a>.
 			</p>
@@ -234,10 +235,10 @@
 				var hitMarker = new Marker( hitLocation_latLong );
 				
 				var size = ( hit.event=="Home Run" || hit.event=="Grounded Into DP" ) ? 15 : 6;
-				var icon = hit.hit_type=="O" ? "pinkDot.png" : "blueDot.png";
+				var icon = hit.hit_type=="O" ? "images/pinkDot.png" : "images/blueDot.png";
 				
 				hitMarker.setIcon( icon, [ size, size ] );
-				hitMarker.setShadowIcon( "blank.png", [ 10, 10 ] );
+				hitMarker.setShadowIcon( "images/blank.png", [ 10, 10 ] );
 				hitMarker.setLabel( hit.event );
 				hitMarker.setInfoBubble( hit.des );
 				
@@ -249,8 +250,8 @@
         		
 			function placeBases() {
 				var homePlateMarker = new Marker( new LatLonPoint( parseFloat( stadium.geo.home_plate.latitude ), parseFloat( stadium.geo.home_plate.longitude ) ) );
-				homePlateMarker.setIcon( "base.png", [ 7, 7 ] );
-				homePlateMarker.setShadowIcon( "blank.png", [ 10, 10 ] );
+				homePlateMarker.setIcon( "images/base.png", [ 7, 7 ] );
+				homePlateMarker.setShadowIcon( "images/blank.png", [ 10, 10 ] );
 					
 				mapstraction.addMarker( homePlateMarker );
 				
@@ -277,8 +278,8 @@
 															parseFloat( stadium.geo.home_plate.longitude ) + base.x / lngConv );
 					
 					var marker = new Marker( baseLocation );
-					marker.setIcon( "base.png", [ 7, 7 ] );
-					marker.setShadowIcon( "blank.png", [ 10, 10 ] );
+					marker.setIcon( "images/base.png", [ 7, 7 ] );
+					marker.setShadowIcon( "images/blank.png", [ 10, 10 ] );
 					
 					mapstraction.addMarker( marker );
 				}

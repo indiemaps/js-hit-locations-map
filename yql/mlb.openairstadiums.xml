@@ -2,7 +2,7 @@
 <table xmlns="http://query.yahooapis.com/v1/schema/table.xsd">
 	<meta>
 		<author>Zachary Forest Johnson</author>
-		<documentationURL>muggable</documentationURL>
+		<documentationURL>http://indiemaps.com/js-hit-locations-map/</documentationURL>
 		<sampleQuery>select * from mlb.openairstadiums</sampleQuery>
 	</meta>
 	<bindings>
