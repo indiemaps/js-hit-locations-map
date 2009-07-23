@@ -2,8 +2,8 @@
 <table xmlns="http://query.yahooapis.com/v1/schema/table.xsd">
 	<meta>
 		<author>Zachary Forest Johnson</author>
-		<documentationURL>muggable</documentationURL>
-		<sampleQuery>select * from mlb.gd2.games where year="2009" and month="07" and day="03" and runs_away>10.5</sampleQuery>
+		<documentationURL>http://indiemaps.com/js-hit-locations-map/</documentationURL>
+		<sampleQuery>select * from mlb.gd2.games where year="2009" and month="07" and day="03"</sampleQuery>
 	</meta>
 	<bindings>
 		<select itemPath="result.game" produces="JSON">
@@ -23,9 +23,9 @@
         		var datePart = "year_" + year + "/month_" + month + "/day_" + day;
         		var scoreboardPart = "/scoreboard.xml";
         		var scoreboardURLForDate = baseURI + datePart + scoreboardPart;
-        		
         		var xml = y.rest( scoreboardURLForDate ).get().response;     		
         		
+        		// this will be the response object
         		var gamesObject = { 'game' : new Array() };
         		
         		for each ( var game in xml.go_game ) {        			
@@ -38,11 +38,7 @@
         			var playersXML = y.rest( gameURL + 'players.xml' ).get().response;
         			
         			var ar = boxscoreXML.game_info.toString().match(/<br\/><b>Weather<\/b>: (\d+) degrees,.*<br\/><b>Wind<\/b>: (\d+) mph, ([\w\s]+).<br\/>/);
-        			
-        			// gid_2009_06_08_sfnmlb_flomlb_1
-        			// 2009/07/19/chnmlb-wasmlb-1
-        			
-        			
+
         			var gameObject = {
         				'gid' 			: 'gid_' + gid,
         				'game_id'		: boxscoreXML.@game_id.toString(),
@@ -67,11 +63,6 @@
   						'local_time' 	: gameXML.@local_game_time.toString(),
   						'stadium_id'	: gameXML.stadium.@id.toString()
         			};
-        			
-        			// get the weather info from the boxscore
-        			
-        			// get the 
-        			
         			gamesObject.game.push( gameObject );
         		}
         		

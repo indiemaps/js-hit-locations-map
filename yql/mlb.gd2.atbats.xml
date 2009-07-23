@@ -2,7 +2,7 @@
 <table xmlns="http://query.yahooapis.com/v1/schema/table.xsd">
 	<meta>
 		<author>Zachary Forest Johnson</author>
-		<documentationURL>muggable</documentationURL>
+		<documentationURL>http://indiemaps.com/js-hit-locations-map/</documentationURL>
 		<sampleQuery>select * from mlb.gd2.atbats where gid="gid_2009_07_16_milmlb_cinmlb_1"</sampleQuery>
 	</meta>
 	<bindings>
@@ -23,12 +23,10 @@
 				
 				var baseURI = "http://gd2.mlb.com/components/game/mlb/";
         		var datePart = "year_" + year + "/month_" + month + "/day_" + day;
-        		
         		var gameURL = baseURI + datePart + "/" + gid + "/";
-        		
         		var inningHitXML = y.rest( gameURL + "inning/inning_hit.xml" ).get().response;
         		
-        		
+        		// this will be the response object
         		var atbatsObject = { 'atbat' : new Array() };
         		
         		var inningNumber = 1;
@@ -39,12 +37,9 @@
         			if ( !inningXML ) {
         				break;
         			}
-        			
-        			// y.log( inningNumber + inningXML );
-        			
+        			        			
         			for each ( var atbat in inningXML..atbat ) {
         				var hip = inningHitXML..hip.( @[ 'inning' ] == inningNumber && @[ 'batter' ] == atbat.@batter && @[ 'pitcher' ] == atbat.@pitcher );
-        				// y.log( hip );
         				
         				var atBat = {
         					'inning'	: inningNumber,
@@ -62,12 +57,9 @@
         					'hit_type'	: hip.@type.toString()
         				};
         				
-        				
         				atbatsObject.atbat.push( atBat );
         			}
         			inningNumber += 1;
-        			
-        			if ( inningNumber > 15 ) break;
         		}
         		
         		response.object = atbatsObject;
