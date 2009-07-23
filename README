@@ -1,1 +1,1 @@
-A work in progress.
+Includes a demo and YQL tables used to visualize baseball hits/outs on a Google hybrid map. Data are loaded from MLB Gameday via YQL tables and displayed with Mapstraction, YUI, and jQuery.
