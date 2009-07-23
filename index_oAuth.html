@@ -1,0 +1,352 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/2000/REC-xhtml1-20000126/DTD/xhtml1-strict.dtd">
+<html>
+    <head>
+    	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+		<meta name="author" content="Zachary Forest Johnson" />
+		
+        <title>MLB hit locations on a Google Map</title>
+        
+		<!-- YUI -->
+		<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?2.7.0/build/paginator/assets/skins/sam/paginator.css&2.7.0/build/datatable/assets/skins/sam/datatable.css">
+		<script type="text/javascript" src="http://yui.yahooapis.com/combo?2.7.0/build/yahoo-dom-event/yahoo-dom-event.js&2.7.0/build/datasource/datasource-min.js&2.7.0/build/element/element-min.js&2.7.0/build/paginator/paginator-min.js&2.7.0/build/datatable/datatable-min.js"></script>
+
+		<!-- Mapstraction -->
+		<script src="http://maps.google.com/maps?file=api&v=2&key=ABQIAAAAJOq-F1-5CeJCDUF1QxoJLBSc9HEPH6PQyLG9Zs3AxnXJSuzAXBQG1S5P2Kf6KLQsAoaHLODIXSxRDA" type="text/javascript"></script>
+		<script type="text/javascript" src="http://www.mapstraction.com/mapstraction-js/mapstraction.js"></script>
+		
+		<!-- jQuery -->
+		<script src="http://code.jquery.com/jquery-latest.js"></script>
+		
+		<!-- jQuery URL parser (local) -->
+		<script type="text/javascript" src="jquery.url.js"></script>
+		
+		<!-- oauth (local) -->
+		<script type="text/javascript" src="oauth.js"></script>
+		<script type="text/javascript" src="sha1.js"></script>
+		
+		<!-- css (local) -->
+		<link rel="stylesheet" type="text/css" href="js-hit-locations-map.css">
+		
+	</head>
+	
+	<body>
+		
+		<div id="wrap">
+		
+			<h1 id="game">Loading game info...</h1>
+			<h2 id="venue">Loading stadium info...</h2>
+		
+			<div id="left">
+				<!-- HTML Map element - the size must be specified here, or in the CSS -->
+				<div id="mapstraction"></div>
+		
+				<h3 id="hitsLoading">Loading hits...</h3>
+				
+				<p id="legend">
+					<img class="legendChip_small" src="images/blueDot.png" width="6" height="6" /> = hit, <img class="legendChip_small" src="images/pinkDot.png" width="6" height="6" /> = out, <img class="legendChip_big" src="images/blueDot.png" width="15" height="15" /> = home run, <img class="legendChip_big" src="images/pinkDot.png" width="15" height="15" /> = double play ball
+				</p>
+				
+			</div>
+			
+			<div id="right" class="yui-skin-sam">
+				<h3 id="ballsInPlay"></h3>
+				<div id="hitsTable"></div>
+			</div>
+			
+			<p>The above mashup loads hit location data from <a href="http://gd2.mlb.com/components/game/mlb/">MLB Gameday</a> data via <a href="http://developer.yahoo.com/yql/">YQL</a> and <a href="http://jquery.com/">jQuery</a>. Data are transformed from an arbitrary pixel coordinate system to latitude-longitude points using methods I describe <a href="">here</a>. Data are presented on <a href="http://maps.google.com/">Google Maps</a> satellite tiles, using <a href="http://mapstraction.com/">Mapstraction</a> as a wrapper. The accompanying <a href="http://developer.yahoo.com/yui/">YUI</a> table shows the same data and allows selection of balls-in-play.</p>
+			
+			<p>Please excuse the wait: the YQL queries typically take a few secs to gather the game, stadium, and hit data, but in rare cases queries can take upwards of a minute. In rarer cases the whole thing freaks out and you have to hit refresh.</p>
+			<p>
+				By default (without a game specified as a url parameter), this page shows the 2009 all star game.  To see another game, simply add a <code>gid</code> parameter to the URL.  The <code>gid</code> parameter is composed as follows:
+				<ul>
+					<li><code>gid_{year}_{month}_{day}_{away_team}mlb_{home_team}mlb_{game_number}</code></li>
+				</ul>
+				So, the default <code>gid</code>, the 2009 all star game, is <a href="http://indiemaps.com/js-hit-locations-map/index.html?gid=gid_2009_07_14_aasmlb_nasmlb_1"><code>gid_2009_07_14_aasmlb_nasmlb_1</code></a>.  A few other example games:
+				<ul>
+					<li><a href="http://indiemaps.com/js-hit-locations-map/index.html?gid=gid_2009_07_10_sdnmlb_sfnmlb_1"><code>gid_2009_07_10_sdnmlb_sfnmlb_1</code></a>: Padres at Giants, July 10, 2009 (2009's only no-hitter)</li>
+					<li><a href="http://indiemaps.com/js-hit-locations-map/index.html?gid=gid_2009_05_22_phimlb_nyamlb_1"><code>gid_2009_05_22_phimlb_nyamlb_1</code></a>: Phillies at Yankees, May 22, 2009 (includes 2009's <a href="http://www.hittrackeronline.com/">longest homer</a>, 477 ft. by Raul Ibanez)</li>
+					<li><a href="http://indiemaps.com/js-hit-locations-map/index.html?gid=gid_2009_05_03_oakmlb_seamlb_1"><code>gid_2009_05_03_oakmlb_seamlb_1</code></a>: Athletics at Mariners, May 3, 2009 (the longest game this season)</li>
+				</ul>
+				Created by Zachary Forest Johnson of <a href="http://indiemaps.com/blog">indiemaps.com</a>. Just <em>view source</em> to see what's going on. Code is <a href="http://www.opensource.org/licenses/bsd-license.php">BSD</a> licensed and available <a href="http://github.com/indiemaps/js-hit-locations-map/tree/master">on github</a>.
+			</p>
+			
+		</div> <!-- wrap -->
+		
+		<script type="text/javascript">
+		
+			var gid;
+			var stadium;
+			var game;
+			var hits;
+			var hitMarkers = new Array();
+				
+			var latConv;
+			var lngConv;
+			
+			var mapstraction;
+			
+			var yahooAPI = "dj0yJmk9MXJZRVFIS05Sb29GJmQ9WVdrOVp6QmxjVFZrTjJrbWNHbzlNVGt3T1RRMU16WTJNdy0tJnM9Y29uc3VtZXJzZWNyZXQmeD0xNA--";
+			var yahooSharedSecret = "4eda3450579663e4248c828d27f909a24a3fcf6b";
+			
+			var myColumnDefs = [
+				{key:"inning", label:"Inning", sortable:true, width:50 },
+				{key:"event", label:"Event", sortable:true, width:50 },
+				{key:"des", label:"Description", width:350}
+			];
+			
+			var myConfigs = {
+				selectionMode:"single",
+				height:"488px"
+			};
+				
+			$( document ).ready( function() {
+								
+				$( 'p#legend' ).hide();
+				
+				gid = jQuery.url.param("gid");				
+				if ( ! gid ) {
+					gid = "gid_2009_07_14_aasmlb_nasmlb_1";
+				}
+				
+				mapstraction = new Mapstraction('mapstraction','google');
+				mapstraction.setMapType( Mapstraction.HYBRID );
+				
+				getGame( gid );
+				
+			} );
+			
+			var loadJSON = function(url) {
+				var headID = document.getElementsByTagName("head")[0];         
+				var newScript = document.createElement('script');
+					newScript.type = 'text/javascript';
+					newScript.src = url;
+				headID.appendChild(newScript);
+			}
+        	
+        	var gameCallback = function( yqlResults ) {  						
+				game = yqlResults.query.results.game;
+						
+				// add teams to game h1
+				$('#game').html( game.teams.away.name_brief + " at " + game.teams.home.name_brief + " <span id='date'>" + game.date + "<\/span>" );
+						
+				getStadium( game.stadium_id, gid );
+							
+			}
+        		
+        	function getGame( gid ) {
+        		var year = gid.substring( 4, 8 );
+				var month = gid.substring( 9, 11 );
+				var day = gid.substring( 12, 14 );				
+					
+				var gameQueryURL = "http://query.yahooapis.com/v1/yql?q=" +
+					"select%20*%20from%20games%20where%20year%3D%22" + 
+					year + 
+					"%22%20and%20month%3D%22" + 
+					month + 
+					"%22%20and%20day%3D%22" + 
+					day + 
+					"%22%20and%20gid%3D%22" +
+					gid + 
+					"%22&format=json&env=http%3A%2F%2Fgithub.com%2Findiemaps%2Fjs-hit-locations-map%2Fraw%2Fmaster%2Fyql%2Fmlb.gd2.env&callback=gameCallback";
+				
+				var gameQuerySigned = makeSignedRequest( yahooAPI, yahooSharedSecret, gameQueryURL );
+				alert(gameQuerySigned);
+				
+				loadJSON( gameQuerySigned );
+        	}
+        	
+        	var stadiumCallback = function( yqlResults ) {
+        		stadium = yqlResults.query.results.stadium;
+						
+				$('#venue').text( stadium.name );
+		
+				var homePlate_latLong = new LatLonPoint( parseFloat( stadium.geo.home_plate.latitude ), parseFloat( stadium.geo.home_plate.longitude ) );
+				
+				// m per degree
+				latConv = homePlate_latLong.distance( new LatLonPoint( homePlate_latLong.lat + .001, homePlate_latLong.lng ) ) * 1000000;
+				lngConv = homePlate_latLong.distance( new LatLonPoint( homePlate_latLong.lat, homePlate_latLong.lng + .001 ) ) * 1000000;
+				
+				var fieldCenter_feet = { x : 0, y : 250 };
+				var fieldCenter_feet_rotated = rotatePoint( fieldCenter_feet.x, fieldCenter_feet.y, stadium.geo.orientation.degrees );
+				
+				var stadiumCenter = new LatLonPoint( homePlate_latLong.lat + feetToMeters( fieldCenter_feet_rotated.y ) / latConv,
+												homePlate_latLong.lng + feetToMeters( fieldCenter_feet_rotated.x ) / lngConv );
+				
+				// display the map centered on a latitude and longitude (Google zoom levels)
+				mapstraction.setCenterAndZoom( stadiumCenter, 18 );
+				
+				placeBases();
+				
+				getHits( gid );
+        	}
+        	
+        	function getStadium( sid, gid ) {
+				var stadiumQueryURL = "http://query.yahooapis.com/v1/yql?q=" +
+					"select%20*%20from%20stadiums%20where%20id%3D%22" +
+					game.stadium_id +
+					"%22&format=json&env=http%3A%2F%2Fgithub.com%2Findiemaps%2Fjs-hit-locations-map%2Fraw%2Fmaster%2Fyql%2Fmlb.gd2.env&callback=stadiumCallback";
+				
+				var stadiumQuerySigned = makeSignedRequest( yahooAPI, yahooSharedSecret, stadiumQueryURL );
+				
+				loadJSON( stadiumQuerySigned );
+        	}
+        	
+        	var hitsCallback = function( yqlResults ) {
+        		alert( "hits callback" );
+        		
+        		hits = yqlResults.query.results.atbat;
+						
+				$.each( hits, function( index, item ) { addHitToMap( item ); } );  									
+				$('#hitsLoading').text( "" );
+				$('#ballsInPlay').text( "Balls in play" );
+				$( 'p#legend' ).show();
+				
+				mapstraction.addSmallControls();
+				
+				var myDataSource = new YAHOO.util.LocalDataSource( hits );
+				var myDataTable = new YAHOO.widget.ScrollingDataTable( "hitsTable",myColumnDefs,myDataSource,myConfigs );									
+				
+				myDataTable.subscribe(	"rowMouseoverEvent", myDataTable.onEventHighlightRow );
+				myDataTable.subscribe("rowMouseoutEvent", myDataTable.onEventUnhighlightRow);
+				myDataTable.subscribe(	"rowClickEvent", 
+										function( oArgs ) {
+											myDataTable.onEventSelectRow( oArgs.event );
+											var selID = myDataTable.getSelectedRows()[0].substring( 7, 9999 );
+											hitMarkers[ parseInt( selID ) ].openBubble();
+										} );
+        	}
+        	
+        	function getHits( gid ) {        							
+				var hitsQueryURL = "http://query.yahooapis.com/v1/yql?q=" +
+					"select%20*%20from%20atbats%20where%20gid%3D%22" +
+					gid +
+					"%22%20and%20hit_x%3C%3E%22NaN%22&format=json&env=http%3A%2F%2Fgithub.com%2Findiemaps%2Fjs-hit-locations-map%2Fraw%2Fmaster%2Fyql%2Fmlb.gd2.env&callback=hitsCallback";
+				
+				var hitsQuerySigned = makeSignedRequest( yahooAPI, yahooSharedSecret, hitsQueryURL );
+				
+				loadJSON( hitsQuerySigned );
+        	}
+        		
+        	function addHitToMap( hit ) {
+				var hitLocation_feet = { 	x : ( parseFloat( hit.hit_x ) - parseFloat( stadium.gameday.year2009.home_plate.x ) ) * parseFloat( stadium.gameday.year2009.pixels_per_foot ),
+											y : ( -parseFloat( hit.hit_y ) + parseFloat( stadium.gameday.year2009.home_plate.y ) ) * parseFloat( stadium.gameday.year2009.pixels_per_foot ) };
+				
+				var hitLocation_feet_rotated = rotatePoint( hitLocation_feet.x, hitLocation_feet.y, parseFloat( stadium.geo.orientation.degrees ) );
+				
+				
+				var hitLocation_latLong = new LatLonPoint( 	parseFloat( stadium.geo.home_plate.latitude ) + feetToMeters( hitLocation_feet_rotated.y ) / latConv, 
+															parseFloat( stadium.geo.home_plate.longitude ) + feetToMeters( hitLocation_feet_rotated.x ) / lngConv );
+				
+				hit.latitude = hitLocation_latLong.lat;
+				hit.longitude = hitLocation_latLong.lng;
+				
+				var hitMarker = new Marker( hitLocation_latLong );
+				
+				var size = ( hit.event=="Home Run" || hit.event=="Grounded Into DP" ) ? 15 : 6;
+				var icon = hit.hit_type=="O" ? "images/pinkDot.png" : "images/blueDot.png";
+				
+				hitMarker.setIcon( icon, [ size, size ] );
+				hitMarker.setShadowIcon( "images/blank.png", [ 10, 10 ] );
+				hitMarker.setLabel( hit.event );
+				hitMarker.setInfoBubble( hit.des );
+				
+				mapstraction.addMarker( hitMarker );
+				
+				hitMarkers.push( hitMarker );
+				
+			}
+        		
+			function placeBases() {
+				var homePlateMarker = new Marker( new LatLonPoint( parseFloat( stadium.geo.home_plate.latitude ), parseFloat( stadium.geo.home_plate.longitude ) ) );
+				homePlateMarker.setIcon( "images/base.png", [ 7, 7 ] );
+				homePlateMarker.setShadowIcon( "images/blank.png", [ 10, 10 ] );
+					
+				mapstraction.addMarker( homePlateMarker );
+				
+				var bases_meters_rotated = new Array();
+				
+				
+				// second base
+				var secondBase_meters = { x : 0, y : feetToMeters( 127.28125 ) };
+				
+				bases_meters_rotated.push( rotatePoint( secondBase_meters.x, secondBase_meters.y, parseFloat( stadium.geo.orientation.degrees ) ) );
+			
+				// first & third base
+				var firstBase_meters = { x : 0, y : 27.4 };
+									
+				bases_meters_rotated.push( rotatePoint( firstBase_meters.x, firstBase_meters.y, -45 + parseFloat( stadium.geo.orientation.degrees ) ) );
+				bases_meters_rotated.push( rotatePoint( firstBase_meters.x, firstBase_meters.y, 45 + parseFloat( stadium.geo.orientation.degrees ) ) );
+			
+				
+				for ( var i = 0; i < bases_meters_rotated.length; i++ ) {					
+					
+					var base = bases_meters_rotated[ i ];
+					
+					var baseLocation = new LatLonPoint( 	parseFloat( stadium.geo.home_plate.latitude ) + base.y / latConv, 
+															parseFloat( stadium.geo.home_plate.longitude ) + base.x / lngConv );
+					
+					var marker = new Marker( baseLocation );
+					marker.setIcon( "images/base.png", [ 7, 7 ] );
+					marker.setShadowIcon( "images/blank.png", [ 10, 10 ] );
+					
+					mapstraction.addMarker( marker );
+				}
+			}
+        		
+			function rotatePoint( x, y, rotation_degrees ) 
+			{
+				var rotation_radians = rotation_degrees / 180 * Math.PI;		
+				return { 	x : x * Math.cos( rotation_radians ) - y * Math.sin( rotation_radians ),
+							y : x * Math.sin( rotation_radians ) + y * Math.cos( rotation_radians ) };
+			}
+			
+			function feetToMeters( feet ) { return feet / 3.2808399; }
+			
+			var makeSignedRequest = function(ck,cks,encodedurl) {     
+				
+			
+				var accessor = { consumerSecret: cks, tokenSecret: ""};          
+				var message = { action: encodedurl, method: "GET", parameters: [["oauth_version","1.0"],["oauth_consumer_key",ck]]};
+				OAuth.setTimestampAndNonce(message);
+				OAuth.SignatureMethod.sign(message, accessor);
+			 
+				var parameterMap = OAuth.getParameterMap(message);
+				var baseStr = OAuth.decodeForm(OAuth.SignatureMethod.getBaseString(message));           
+				var theSig = "";
+			 
+				if (parameterMap.parameters) {
+					for (var item in parameterMap.parameters) {
+						for (var subitem in parameterMap.parameters[item]) {
+							if (parameterMap.parameters[item][subitem] == "oauth_signature") {
+								theSig = parameterMap.parameters[item][1];                    
+								break;                      
+							}
+						}
+					}
+				}
+			 
+				var paramList = baseStr[2][0].split("&");
+				paramList.push("oauth_signature="+theSig);
+				paramList.sort(function(a,b) {
+					if (a[0] < b[0]) return -1;
+					if (a[0] > b[0]) return 1;
+					if (a[1] < b[1]) return  -1;
+					if (a[1] > b[1]) return 1;
+					return 0;
+				});
+			 
+				var locString = "";
+				for (var x in paramList) {
+					locString += paramList[x] + "&";                
+				}
+			 
+				var finalStr = baseStr[1][0] + "?" + locString.slice(0,locString.length - 1);
+			 
+				return finalStr;
+			};
+			
+		</script> 
+
+	</body>
+</html>

@@ -6,7 +6,7 @@
 		<sampleQuery>select * from mlb.openairstadiums</sampleQuery>
 	</meta>
 	<bindings>
-		<select itemPath="stadiums.stadium" produces="XML">
+		<select itemPath="stadiums.stadium" produces="XML" maxAge="24000">
 			<urls>
 				<url>http://indiemaps.com/js-hit-locations-map/openairstadiums.xml</url>
 			</urls>

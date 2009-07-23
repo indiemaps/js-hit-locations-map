@@ -6,7 +6,7 @@
 		<sampleQuery>select * from mlb.gd2.games where year="2009" and month="07" and day="03"</sampleQuery>
 	</meta>
 	<bindings>
-		<select itemPath="result.game" produces="JSON">
+		<select itemPath="result.game" produces="JSON" maxAge="24000">
 			<urls>
 				<url>http://gd2.mlb.com/components/game/mlb/</url>
 			</urls>
