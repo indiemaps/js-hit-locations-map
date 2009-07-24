@@ -107,7 +107,7 @@
 		
 		<gameday>
 			<year2009>
-				<home_plate x="125" y="210" />
+				<home_plate x="128" y="210" />
 				<pixels_per_foot>2.326</pixels_per_foot>
 			</year2009>
 		</gameday>

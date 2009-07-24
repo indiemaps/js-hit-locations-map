@@ -151,7 +151,6 @@
 					"%22&format=json&env=http%3A%2F%2Fgithub.com%2Findiemaps%2Fjs-hit-locations-map%2Fraw%2Fmaster%2Fyql%2Fmlb.gd2.env&callback=gameCallback";
 				
 				var gameQuerySigned = makeSignedRequest( yahooAPI, yahooSharedSecret, gameQueryURL );
-				alert(gameQuerySigned);
 				
 				loadJSON( gameQuerySigned );
         	}
@@ -193,7 +192,6 @@
         	}
         	
         	var hitsCallback = function( yqlResults ) {
-        		alert( "hits callback" );
         		
         		hits = yqlResults.query.results.atbat;
 						
